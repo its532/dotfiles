@@ -12,7 +12,6 @@ list: ## Show dot files in this repo
 
 install: ## Create symlink to home directory
 	@echo 'Copyright (c) 2013-2015 BABAROT All Rights Reserved.'
-  @echo '==> Install zplug'
 	@if !(type "zsh" > /dev/null 2>&1); then \
 		@curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh; \
 	else \
