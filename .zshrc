@@ -1,14 +1,14 @@
 # plugin
-source ~/.zsh/config/plugin.zsh
+source ~/zsh/config/plugin.zsh
 
 fpath=(path/to/zsh-completions/src $fpath)
 
 # git-promptの読み込み
-source ~/.zsh/git/git-prompt.sh
+source ~/zsh/git/git-prompt.sh
 
 # git-completionの読み込み
-fpath=(~/.zsh $fpath)
-zstyle ':completion:*:*:git:*' script ~/.zsh/git/git-completion.bash
+fpath=(~/zsh $fpath)
+zstyle ':completion:*:*:git:*' script ~/zsh/git/git-completion.bash
 autoload -Uz compinit && compinit
 
 # プロンプトのオプション表示設定
@@ -31,4 +31,4 @@ setopt inc_append_history
 setopt share_history
 
 # peco
-source ~/.zsh/config/search.zsh
+source ~/zsh/config/search.zsh
