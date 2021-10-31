@@ -1,3 +1,12 @@
+if [ -f ~/.zplug/init.zsh ]; then
+else
+	if [ -d ~/.zplug ]; then
+	else
+		mkdir ~/.zplug
+	fi
+	git clone https://github.com/zplug/zplug ~/.zplug
+fi
+
 source ~/.zplug/init.zsh
 
 # zplug
@@ -7,10 +16,10 @@ zplug "zsh-users/zsh-autosuggestions"
 
 # install plugins
 if ! zplug check --verbose; then
-printf "Install? [y/N]: "
-if read -q; then
-  echo; zplug install
-fi
+  printf "Install? [y/N]: "
+  if read -q; then
+    echo; zplug install
+  fi
 fi
 
 zplug load
