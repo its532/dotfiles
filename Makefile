@@ -15,15 +15,15 @@ list: ## Show dot files in this repo
 
 install: ## Create symlink to home directory
 	@echo 'Copyright (c) 2013-2015 BABAROT All Rights Reserved.'
-  ifndef HAVE_BREW
+ifndef HAVE_BREW
 	@echo "Installing HomwBrew"
 	@/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  endif
+endif
 
-  ifndef HAVE_PECO
+ifndef HAVE_PECO
 	@echo "Installing peco"
 	@brew install peco
-  endif
+endif
 
 	@if !(type "zsh" > /dev/null 2>&1); then \
 		@curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh; \
