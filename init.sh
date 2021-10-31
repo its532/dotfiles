@@ -3,7 +3,7 @@ DOT_DIR="$HOME/dotfiles"
 
 # clone
 # git clone git@github.com:fkubota/dotfiles.git ${DOT_DIR}
-git clone https://github.com/its532/dotfiles.git ${DOT_DIR}
+# git clone https://github.com/its532/dotfiles.git ${DOT_DIR}
 
 ln -sf ${DOT_DIR}/zsh/config/plugin.zsh ~/.config/zsh/config/plugin.zsh
 ln -sf ${DOT_DIR}/zsh/config/search.zsh ~/.config/zsh/config/search.zsh
