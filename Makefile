@@ -7,6 +7,7 @@ DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
 HAVE_BREW:=$(shell which brew)
 HAVE_PECO:=$(shell which peco)
+HAVE_POSH:=$(shell which oh-my-posh)
 
 all:
 
@@ -23,6 +24,12 @@ endif
 ifndef HAVE_PECO
 	@echo "Installing peco"
 	@brew install peco
+endif
+
+ifndef HAVE_POSH
+	@echo "Installing posh"
+	@brew install jandedobbeleer/oh-my-posh/oh-my-posh
+	@cp ./its.omp.json ~/its.omp.json
 endif
 
 	@if !(type "zsh" > /dev/null 2>&1); then \

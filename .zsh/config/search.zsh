@@ -4,7 +4,7 @@ function peco-history-selection() {
     CURSOR=$#BUFFER
     zle reset-prompt
 }
- 
+
 zle -N peco-history-selection
 bindkey '^F' peco-history-selection
 
@@ -20,12 +20,14 @@ function peco-vim() {
 zle -N peco-vim
 bindkey '^R' peco-vim
 
-function peco-cdr () {
-    local selected_dir="$(cdr -l | sed 's/^[0-9]\+ \+//' | peco --prompt="cdr >" --query "$LBUFFER")"
+# ここから追加
+function peco-src () {
+    local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
     if [ -n "$selected_dir" ]; then
         BUFFER="cd ${selected_dir}"
         zle accept-line
     fi
+    zle clear-screen
 }
-zle -N peco-cdr
-bindkey '^E' peco-cdr
+zle -N peco-src
+bindkey '^G' peco-src
