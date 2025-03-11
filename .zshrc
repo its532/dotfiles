@@ -1,6 +1,6 @@
 # plugin
 source ~/.zsh/config/plugin.zsh
-
+i
 fpath=(path/to/zsh-completions/src $fpath)
 
 # alias
