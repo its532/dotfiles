@@ -6,26 +6,31 @@ fpath=(path/to/zsh-completions/src $fpath)
 # alias
 
 # system
-alias vim="nvim"
+alias n="nvim"
+alias vim="vim"
 alias v=vim
-alias vz="vim ~/.zshrc"
-alias vv="vim ~/.vimrc"
-alias sz="source ~/.zshrc"
+alias vz="vim ~/.zshrc" alias vv="vim ~/.vimrc" alias sz="source ~/.zshrc"
 alias bz='bat ~/.zshrc'
 alias cat='bat'
-alias l='exa'
-alias ls=l
-alias ll='exa -l'
+alias ls='eza -lh --group-directories-first --icons'
+alias lsa='ls -a'
+alias lt='eza --tree --level=2 --long --icons --git'
+alias lta='lt -a'
+alias cd='z'
+alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
 
 # docker
 alias d='docker'
 alias dc='docker-compose'
 alias dimg='docker image'
 alias dct='docker container'
+alias lzd='lazydocker'
 
 # git
 alias gcm='git commit -m'
 alias g="git"
+alias gs="git status"
+alias lzg='lazygit'
 
 # history
 export HISTFILE=~/.zsh-history
@@ -43,7 +48,7 @@ setopt share_history
 # ここから追加
 export GOPATH=$HOME
 export PATH=$PATH:$GOPATH/bin
-export EDITOR=/usr/local/bin/nvim
+export EDITOR=nvim
 export PATH=$HOME/.nodebrew/current/bin:$PATH
 
 export PYENV_ROOT="$HOME/.pyenv" 
@@ -62,13 +67,20 @@ autoload -U compinit && compinit -u
 export FZF_DEFAULT_OPTS='--height 70% --layout=reverse --border'
 
 # fgb - checkout git branch
-fgb() {
-  local branches branch
-  branches=$(git branch --all | grep -v HEAD) &&
-  branch=$(echo "$branches" |
-           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
-  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+function select-git-switch() {
+  target_br=$(
+    git branch -a |
+      fzf --exit-0 --layout=reverse --info=hidden --no-multi --preview-window="right,65%" --prompt="CHECKOUT BRANCH > " --preview="echo {} | tr -d ' *' | xargs git log --graph --decorate --abbrev-commit --color=always" |
+      head -n 1 |
+      perl -pe "s/\s//g; s/\*//g; s/remotes\/origin\///g"
+  )
+  if [ -n "$target_br" ]; then
+    BUFFER="git switch $target_br"
+    zle accept-line
+  fi
 }
+zle -N select-git-switch
+bindkey "^b" select-git-switch
 
 # flog - git commit browser
 flog() {
@@ -101,6 +113,51 @@ fadd() {
   done
 }
 
+function gadd() {
+    local selected
+    local convert_to_eucjp=false
+
+    # Check if -e argument is passed
+    if [[ $1 == "-e" ]]; then
+        convert_to_eucjp=true
+    fi
+
+    if $convert_to_eucjp; then
+      selected=$(unbuffer git status -s | fzf -m --ansi --preview="echo {} | awk '{print \$2}' | xargs git diff --color | nkf" | awk '{print $2}')
+    else
+      selected=$(unbuffer git status -s | fzf -m --ansi --preview="echo {} | awk '{print \$2}' | xargs git diff --color" | awk '{print $2}')
+    fi
+
+    if [[ -n "$selected" ]]; then
+        # Convert selected files into an array to handle spaces and newlines properly
+        IFS=$'\n' selected=(${(f)selected})
+
+        # Trim leading and trailing spaces from each file name
+        for i in {1..${#selected[@]}}; do
+            selected[i]=$(echo "${selected[i]}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        done
+
+        # Print selected files for debugging
+        echo "Files to be processed: ${selected[@]}"
+
+        # Get a list of staged files
+        staged_files=$(git diff --name-only --cached)
+
+        for file in "${selected[@]}"; do
+            # Check if the file is already staged
+            if echo "$staged_files" | grep -q "^$file$"; then
+                # If the file is staged, unstage it
+                git reset "$file"
+                echo "Unstaged: $file"
+            else
+                # If the file is not staged, stage it
+                git add "$file"
+                echo "Staged: $file"
+            fi
+        done
+    fi
+}
+
 # fvim: ファイル名検索+Vimで開くファイルをカレントディレクトリからfzfで検索可能に
 fvim() {
   local file
@@ -126,3 +183,34 @@ export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
 setopt no_beep
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
+export PATH="/opt/homebrew/opt/php@7.2/bin:$PATH"
+
+
+# 外部ファイルから環境変数を読み込む
+if [ -f ~/.obsidian.env ]; then
+  export $(grep -v '^#' ~/.obsidian.env | xargs)
+fi
+
+
+# pnpm
+export PNPM_HOME="/Users/itsuki.kikuyama/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# bun completions
+[ -s "/Users/itsuki.kikuyama/.bun/_bun" ] && source "/Users/itsuki.kikuyama/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# papasshで使用するPATH
+export PATH=${PATH}:/Users/itsuki.kikuyama/.local/bin
+
+export CLAUDE_CODE_USE_BEDROCK=1
+export ANTHROPIC_MODEL='apac.anthropic.claude-sonnet-4-20250514-v1:0'
+export AWS_REGION='ap-northeast-1'
+export AWS_PROFILE=oneaws-colorme
